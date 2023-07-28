@@ -1,4 +1,7 @@
 #pragma once
+#include <iostream>
+#include <windows.h>
+
 
 namespace bablShoot {
 
@@ -18,16 +21,14 @@ namespace bablShoot {
 		BaseForm(void)
 		{
 			InitializeComponent();
-			//
-			//TODO: Add the constructor code here
-			//
+			  
+
+			
 			
 		}
 
 	protected:
-		/// <summary>
-		/// Clean up any resources being used.
-		/// </summary>
+		
 		~BaseForm()
 		{
 			if (components)
@@ -37,9 +38,7 @@ namespace bablShoot {
 		}
 
 	private:
-		/// <summary>
-		/// Required designer variable.
-		/// </summary>
+	    
 		System::ComponentModel::Container ^components;
 
 #pragma region Windows Form Designer generated code
@@ -63,31 +62,46 @@ namespace bablShoot {
 		}
 #pragma endregion
 	
-	public: Graphics^ DrawCircle(Color fillColor, int X, int Y)
-		{
+	public: PictureBox^ CopyPictureBox(PictureBox^ sourcePictureBox, int x, int y)
+	{
+		PictureBox^ newPictureBox = gcnew PictureBox();
+		newPictureBox->Image = sourcePictureBox->Image;
+		newPictureBox->Location = System::Drawing::Point(x, y);
+		newPictureBox->Size = sourcePictureBox->Size;
+		newPictureBox->SizeMode = sourcePictureBox->SizeMode;
+		newPictureBox->TabIndex = sourcePictureBox->TabIndex;
+		newPictureBox->TabStop = sourcePictureBox->TabStop;
 
-			Graphics^ g = this->CreateGraphics();
+		// Додати новий PictureBox на форму
+		this->Controls->Add(newPictureBox);
 
-			SolidBrush^ brush = gcnew SolidBrush(fillColor);
-
-			int diameter = 50;
-
-			g->FillEllipse(brush, X, Y, diameter, diameter);
-
-			//delete g;
-			return g;
-		}
-	
-
-	public: array<Color>^ makeColors() {
-		array<Color>^ colorsArray;
-		colorsArray = gcnew array<Color> {
-			Color::Red,
-			Color::Green,
-			Color::Blue,
-			Color::Yellow
-		};
-		return colorsArray;
+		return newPictureBox;
 	}
+
+
+	public: void makeBalls(PictureBox^ red, PictureBox^ yellow,
+		PictureBox^ blue, PictureBox^ green) {
+		for (int j = 0; j < 4; j++) {
+			for (int i = 0; i < 6; i++) {
+				int t = rand() % 4;
+				switch (t)
+				{
+				case(0): CopyPictureBox(red, 20 + i * 70, 500 - j * 70); break;
+				case(1): CopyPictureBox(yellow, 20 + i * 70, 500 - j * 70); break;
+				case(2): CopyPictureBox(blue, 20 + i * 70, 500 - j * 70); break;
+				case(3): CopyPictureBox(green, 20 + i * 70, 500 - j * 70); break;
+				default:
+					break;
+				}
+			}
+		}
+	}
+
+	public: PictureBox^  makeUpBall(PictureBox^ lastPic) {
+		PictureBox^ upBall =  CopyPictureBox(lastPic, 180, 50);
+		return upBall;
+	}
+
+	
 	};
 }
