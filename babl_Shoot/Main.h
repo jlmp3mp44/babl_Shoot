@@ -19,11 +19,11 @@ namespace bablShoot {
 		Main(void)
 		{
 			InitializeComponent();
+		    upBall = makeUpBall(red);
 			
-			moveTimer = gcnew Timer();
-			moveTimer->Interval = 100; // Встановіть інтервал в мілісекундах (тут 100 мс)
-			moveTimer->Tick += gcnew EventHandler(this, &Main::moveTimer_Tick);
 		}
+
+		
 
 	protected:
 		/// <summary>
@@ -40,6 +40,11 @@ namespace bablShoot {
 	private: System::Windows::Forms::PictureBox^ red;
 	private: System::Windows::Forms::PictureBox^ blue;
 	private: System::Windows::Forms::PictureBox^ green;
+	private: PictureBox^ upBall;
+	
+
+
+	private: System::Windows::Forms::Timer^ moveTimer;
 
 	protected:
 
@@ -50,7 +55,6 @@ namespace bablShoot {
 	private:
 		
 		System::ComponentModel::Container ^components;
-		System::Windows::Forms::Timer^ moveTimer;
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -123,6 +127,7 @@ namespace bablShoot {
 			this->Name = L"Main";
 			this->Text = L"Main";
 			this->Load += gcnew System::EventHandler(this, &Main::Main_Load);
+			this->KeyDown += gcnew System::Windows::Forms::KeyEventHandler(this, &Main::Main_KeyDown);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->yellow))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->red))->EndInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->blue))->EndInit();
@@ -134,26 +139,43 @@ namespace bablShoot {
 		
 	
 
-	
 	private: System::Void Main_Load(System::Object^ sender, System::EventArgs^ e) {
 		makeBalls(red, yellow, blue,green);
+		
+		moveTimer = gcnew Timer();
+		moveTimer->Interval = 100; // Встановіть інтервал в мілісекундах (тут 100 мс)
+		moveTimer->Tick += gcnew EventHandler(this, &Main::moveTimer_Tick);
 		moveTimer->Start();
 		
 	}
 
-		   public: void moveTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
-			   PictureBox^ upBall = makeUpBall(red);
-			   int posX = upBall->Location.X;
-			   int posY = upBall->Location.Y;
+		   bool i = true;
+	private: System::Void moveTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
+		int posX = upBall->Location.X;
+		int posY = upBall->Location.Y;
 
-			   // Переміщення PictureBox вправо до певної позиції (тут до 300)
-			   if (posX < 300) {
-				   upBall->Location = Point(posX + 10, posY);
-			   }
-			   else {
-				   // Якщо досягнута кінцева позиція, зупиніть таймер
-				   moveTimer->Stop();
-			   }
-		   }
+		// Переміщення PictureBox вправо до певної позиції (тут до 300)
+		if (i) {
+			upBall->Location = Point(posX + 10, posY);
+			if (posX >= 380) {
+				i = false; // Змінюємо напрямок руху
+			}
+		}
+		// Переміщення PictureBox вліво
+		else {
+			upBall->Location = Point(posX - 10, posY);
+			if (posX <= 20) {
+				i = true; // Змінюємо напрямок руху
+			}
+		}
+	}
+			
+ 
+private: System::Void Main_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
+		if(e->KeyCode==Keys::Enter){
+		}
+
+}
 };
 }
+
