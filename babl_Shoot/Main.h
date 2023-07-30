@@ -20,7 +20,10 @@ namespace bablShoot {
 		{
 			InitializeComponent();
 		    upBall = makeUpBall(red);
-			
+			i = true;
+			allBalls = gcnew System::Collections::Generic::List<PictureBox^>();
+			lastBallColor = Color::White;
+			getBall = false;
 		}
 
 		
@@ -41,10 +44,15 @@ namespace bablShoot {
 	private: System::Windows::Forms::PictureBox^ blue;
 	private: System::Windows::Forms::PictureBox^ green;
 	private: PictureBox^ upBall;
-	
+	private: bool i;
+	private: System::Collections::Generic::List<PictureBox^>^ allBalls;
+	private: Color^ lastBallColor;
+	private: bool getBall;
 
 
 	private: System::Windows::Forms::Timer^ moveTimer;
+
+	private: System::Windows::Forms::Timer^ secondTimer;
 
 	protected:
 
@@ -81,6 +89,7 @@ namespace bablShoot {
 			this->yellow->Name = L"yellow";
 			this->yellow->Size = System::Drawing::Size(81, 81);
 			this->yellow->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
+			this->yellow->ForeColor = Color::Yellow;
 			this->yellow->TabIndex = 0;
 			this->yellow->TabStop = false;
 			// 
@@ -91,6 +100,7 @@ namespace bablShoot {
 			this->red->Name = L"red";
 			this->red->Size = System::Drawing::Size(83, 81);
 			this->red->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
+			this->red->ForeColor = Color::Red;
 			this->red->TabIndex = 1;
 			this->red->TabStop = false;
 			// 
@@ -101,6 +111,7 @@ namespace bablShoot {
 			this->blue->Name = L"blue";
 			this->blue->Size = System::Drawing::Size(83, 81);
 			this->blue->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
+			this->blue->ForeColor = Color::Blue;
 			this->blue->TabIndex = 2;
 			this->blue->TabStop = false;
 			// 
@@ -111,6 +122,7 @@ namespace bablShoot {
 			this->green->Name = L"green";
 			this->green->Size = System::Drawing::Size(83, 81);
 			this->green->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
+			this->green->ForeColor = Color::Green;
 			this->green->TabIndex = 3;
 			this->green->TabStop = false;
 			// 
@@ -140,16 +152,20 @@ namespace bablShoot {
 	
 
 	private: System::Void Main_Load(System::Object^ sender, System::EventArgs^ e) {
-		makeBalls(red, yellow, blue,green);
+		allBalls = makeBalls(red, yellow, blue,green);
 		
 		moveTimer = gcnew Timer();
 		moveTimer->Interval = 100; // Встановіть інтервал в мілісекундах (тут 100 мс)
 		moveTimer->Tick += gcnew EventHandler(this, &Main::moveTimer_Tick);
 		moveTimer->Start();
+
+		secondTimer = gcnew Timer();
+		secondTimer->Interval = 100;
+		secondTimer->Tick += gcnew EventHandler(this, &Main::secondTimer_Tick);
 		
 	}
 
-		   bool i = true;
+
 	private: System::Void moveTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
 		int posX = upBall->Location.X;
 		int posY = upBall->Location.Y;
@@ -171,11 +187,21 @@ namespace bablShoot {
 	}
 			
  
-private: System::Void Main_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
+	private: System::Void Main_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
 		if(e->KeyCode==Keys::Enter){
+			secondTimer->Start();
+			moveTimer->Stop();
 		}
+	}
 
-}
+	public: System::Void secondTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
+		  if(upBall->Location.Y<=500) 
+			  upBall->Location = Point(upBall->Location.X, upBall->Location.Y + 10);
+		  CheckBounds(allBalls, upBall, getBall, secondTimer);
+		 
+	   }
+
+	
 };
 }
 

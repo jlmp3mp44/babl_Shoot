@@ -21,10 +21,7 @@ namespace bablShoot {
 		BaseForm(void)
 		{
 			InitializeComponent();
-			  
-
-			
-			
+			allBalls = gcnew System::Collections::Generic::List<PictureBox^>();
 		}
 
 	protected:
@@ -40,6 +37,7 @@ namespace bablShoot {
 	private:
 	    
 		System::ComponentModel::Container ^components;
+		System::Collections::Generic::List<PictureBox^>^ allBalls;
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -71,35 +69,60 @@ namespace bablShoot {
 		newPictureBox->SizeMode = sourcePictureBox->SizeMode;
 		newPictureBox->TabIndex = sourcePictureBox->TabIndex;
 		newPictureBox->TabStop = sourcePictureBox->TabStop;
+		newPictureBox->ForeColor = sourcePictureBox->ForeColor;
+		
 
-		// Додати новий PictureBox на форму
 		this->Controls->Add(newPictureBox);
 
 		return newPictureBox;
 	}
 
 
-	public: void makeBalls(PictureBox^ red, PictureBox^ yellow,
+	public:System::Collections::Generic::List<PictureBox^>^  
+		makeBalls(PictureBox^ red, PictureBox^ yellow,
 		PictureBox^ blue, PictureBox^ green) {
+		PictureBox^ picBox;
 		for (int j = 0; j < 4; j++) {
 			for (int i = 0; i < 6; i++) {
 				int t = rand() % 4;
 				switch (t)
 				{
-				case(0): CopyPictureBox(red, 20 + i * 70, 500 - j * 70); break;
-				case(1): CopyPictureBox(yellow, 20 + i * 70, 500 - j * 70); break;
-				case(2): CopyPictureBox(blue, 20 + i * 70, 500 - j * 70); break;
-				case(3): CopyPictureBox(green, 20 + i * 70, 500 - j * 70); break;
+				case(0):picBox =  CopyPictureBox(red, 20 + i * 70, 500 - j * 70);
+					break;
+				case(1):picBox = CopyPictureBox(yellow, 20 + i * 70, 500 - j * 70);
+					break;
+				case(2):picBox = CopyPictureBox(blue, 20 + i * 70, 500 - j * 70);
+					break;
+				case(3):picBox = CopyPictureBox(green, 20 + i * 70, 500 - j * 70);
+					break;
 				default:
 					break;
 				}
+				allBalls->Add(picBox);
 			}
 		}
+		return allBalls;
 	}
 
 	public: PictureBox^  makeUpBall(PictureBox^ lastPic) {
 		PictureBox^ upBall =  CopyPictureBox(lastPic, 180, 50);
 		return upBall;
+	}
+
+	public:void CheckBounds(System::Collections::Generic::List<PictureBox^>^% allBalls,
+		PictureBox^% upBall, bool getBall, Timer^ timer) {
+		for (int i = 0; i < allBalls->Count; i++) {
+			if (upBall->Bounds.IntersectsWith(allBalls[i]->Bounds)) {
+				if (upBall->ForeColor == allBalls[i]->ForeColor) {
+					getBall = true;
+					allBalls[i]->Location = Point(-60, -60);
+
+				}
+				else getBall = false;
+				if (!getBall)
+					timer->Stop();
+			}
+		}
 	}
 
 	
