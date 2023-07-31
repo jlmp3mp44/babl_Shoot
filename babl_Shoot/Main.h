@@ -19,7 +19,7 @@ namespace bablShoot {
 		Main(void)
 		{
 			InitializeComponent();
-		    upBall = makeUpBall(red);
+			upBall = makeUpBall(red);
 			i = true;
 			allBalls = gcnew System::Collections::Generic::List<PictureBox^>();
 			lastBall = nullptr;
@@ -27,7 +27,7 @@ namespace bablShoot {
 			touch = false;
 		}
 
-		
+
 
 	protected:
 		/// <summary>
@@ -63,8 +63,8 @@ namespace bablShoot {
 	protected:
 
 	private:
-		
-		System::ComponentModel::Container ^components;
+
+		System::ComponentModel::Container^ components;
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -150,12 +150,12 @@ namespace bablShoot {
 
 		}
 #pragma endregion
-		
-	
+
+
 
 	private: System::Void Main_Load(System::Object^ sender, System::EventArgs^ e) {
-		allBalls = makeBalls(red, yellow, blue,green);
-		
+		allBalls = makeBalls(red, yellow, blue, green);
+
 		moveTimer = gcnew Timer();
 		moveTimer->Interval = 100; // Встановіть інтервал в мілісекундах (тут 100 мс)
 		moveTimer->Tick += gcnew EventHandler(this, &Main::moveTimer_Tick);
@@ -164,7 +164,7 @@ namespace bablShoot {
 		secondTimer = gcnew Timer();
 		secondTimer->Interval = 100;
 		secondTimer->Tick += gcnew EventHandler(this, &Main::secondTimer_Tick);
-		
+
 	}
 
 
@@ -187,12 +187,20 @@ namespace bablShoot {
 			}
 		}
 	}
-			
- 
+
+
 	private: System::Void Main_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
-		if(e->KeyCode==Keys::Enter){
+		if (e->KeyCode == Keys::Enter) {
 			secondTimer->Start();
 			moveTimer->Stop();
+		}
+		else if (e->KeyCode == Keys::Space) {
+			secondTimer->Stop();
+			
+			getBall = false;
+
+			moveTimer->Start();
+			//secondTimer->Start();
 		}
 	}
 
@@ -203,13 +211,14 @@ namespace bablShoot {
 			if (touch && (lastBall != nullptr)) {
 				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
 			}
-			else if (touch && lastBall ==  nullptr) makeUpBall(makeRandomBall(lastBall, red, yellow, blue, green));
+			else if (touch && lastBall == nullptr) {
+				PictureBox^ newBall = CopyPictureBox(upBall, upBall->Location.X, upBall->Location.Y);
+				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
+			}
+
+
 		}
-	    
-
-	}
-
-	
-};
+	};
+	};
 }
 

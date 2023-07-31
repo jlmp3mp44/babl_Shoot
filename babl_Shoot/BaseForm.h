@@ -144,6 +144,7 @@ namespace bablShoot {
 			  int colorIndex;
 			  colorIndex = rand() % 4;
 			  ball = CopyPictureBox(colors[colorIndex], startX, startY);
+			  ball->Location = Point(-100, -100);
 
 					  return ball;
 				  }
