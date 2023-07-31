@@ -22,6 +22,8 @@ namespace bablShoot {
 		{
 			InitializeComponent();
 			allBalls = gcnew System::Collections::Generic::List<PictureBox^>();
+			startX = 180;
+			startY = 50;
 		}
 
 	protected:
@@ -38,6 +40,9 @@ namespace bablShoot {
 	    
 		System::ComponentModel::Container ^components;
 		System::Collections::Generic::List<PictureBox^>^ allBalls;
+		int startX;
+		int startY;
+
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -78,26 +83,20 @@ namespace bablShoot {
 	}
 
 
-	public:System::Collections::Generic::List<PictureBox^>^  
-		makeBalls(PictureBox^ red, PictureBox^ yellow,
+	public:System::Collections ::Generic::List<PictureBox^>^ makeBalls(PictureBox^ red, PictureBox^ yellow,
 		PictureBox^ blue, PictureBox^ green) {
 		PictureBox^ picBox;
+		System::Collections::Generic::List<PictureBox^>^ allBalls =
+			gcnew System::Collections::Generic::List<PictureBox^>();
+		array<PictureBox^>^ colors = gcnew array<PictureBox^>{ red, yellow, blue, green };
+
+		srand(static_cast<unsigned>(time(0)));
+
+		int colorIndex;
 		for (int j = 0; j < 4; j++) {
 			for (int i = 0; i < 6; i++) {
-				int t = rand() % 4;
-				switch (t)
-				{
-				case(0):picBox =  CopyPictureBox(red, 20 + i * 70, 500 - j * 70);
-					break;
-				case(1):picBox = CopyPictureBox(yellow, 20 + i * 70, 500 - j * 70);
-					break;
-				case(2):picBox = CopyPictureBox(blue, 20 + i * 70, 500 - j * 70);
-					break;
-				case(3):picBox = CopyPictureBox(green, 20 + i * 70, 500 - j * 70);
-					break;
-				default:
-					break;
-				}
+				colorIndex = rand() % 4;
+				picBox = CopyPictureBox(colors[colorIndex], 20 + i * 70, 500 - j * 70);
 				allBalls->Add(picBox);
 			}
 		}
@@ -105,16 +104,18 @@ namespace bablShoot {
 	}
 
 	public: PictureBox^  makeUpBall(PictureBox^ lastPic) {
-		PictureBox^ upBall =  CopyPictureBox(lastPic, 180, 50);
+		PictureBox^ upBall =  CopyPictureBox(lastPic, startX, startY);
 		return upBall;
 	}
 
-	public:void CheckBounds(System::Collections::Generic::List<PictureBox^>^% allBalls,
-		PictureBox^% upBall, bool getBall, Timer^ timer) {
+	public:bool CheckBounds(System::Collections::Generic::List<PictureBox^>^% allBalls,
+		PictureBox^% upBall, bool% getBall, Timer^ timer, PictureBox^% lastBall, bool% touch ) {
 		for (int i = 0; i < allBalls->Count; i++) {
 			if (upBall->Bounds.IntersectsWith(allBalls[i]->Bounds)) {
+				touch = true;
 				if (upBall->ForeColor == allBalls[i]->ForeColor) {
 					getBall = true;
+					lastBall = allBalls[i];
 					allBalls[i]->Location = Point(-60, -60);
 
 				}
@@ -123,8 +124,29 @@ namespace bablShoot {
 					timer->Stop();
 			}
 		}
+		return getBall;
 	}
 
-	
+	public: void updateBall(PictureBox^% ball, PictureBox^ sourceBall) {
+		ball->Image = sourceBall->Image;
+		ball->Location = System::Drawing::Point(startX, startY);
+		ball->TabIndex = sourceBall->TabIndex;
+		ball->TabStop = sourceBall->TabStop;
+		ball->ForeColor = sourceBall->ForeColor;
+	}
+
+		  public: PictureBox^ makeRandomBall(PictureBox^% ball, PictureBox^ red, PictureBox^ yellow,
+			  PictureBox^ blue, PictureBox^ green) {
+			  array<PictureBox^>^ colors = gcnew array<PictureBox^>{ red, yellow, blue, green };
+
+			  srand(static_cast<unsigned>(time(0)));
+
+			  int colorIndex;
+			  colorIndex = rand() % 4;
+			  ball = CopyPictureBox(colors[colorIndex], startX, startY);
+
+					  return ball;
+				  }
+
 	};
 }

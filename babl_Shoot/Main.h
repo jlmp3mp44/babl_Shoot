@@ -22,8 +22,9 @@ namespace bablShoot {
 		    upBall = makeUpBall(red);
 			i = true;
 			allBalls = gcnew System::Collections::Generic::List<PictureBox^>();
-			lastBallColor = Color::White;
+			lastBall = nullptr;
 			getBall = false;
+			touch = false;
 		}
 
 		
@@ -46,8 +47,9 @@ namespace bablShoot {
 	private: PictureBox^ upBall;
 	private: bool i;
 	private: System::Collections::Generic::List<PictureBox^>^ allBalls;
-	private: Color^ lastBallColor;
+	private: PictureBox^ lastBall;
 	private: bool getBall;
+	private: bool touch;
 
 
 	private: System::Windows::Forms::Timer^ moveTimer;
@@ -195,11 +197,17 @@ namespace bablShoot {
 	}
 
 	public: System::Void secondTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
-		  if(upBall->Location.Y<=500) 
-			  upBall->Location = Point(upBall->Location.X, upBall->Location.Y + 10);
-		  CheckBounds(allBalls, upBall, getBall, secondTimer);
-		 
-	   }
+		if (upBall->Location.Y <= 500)
+			upBall->Location = Point(upBall->Location.X, upBall->Location.Y + 10);
+		if (!CheckBounds(allBalls, upBall, getBall, secondTimer, lastBall, touch)) {
+			if (touch && (lastBall != nullptr)) {
+				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
+			}
+			else if (touch && lastBall ==  nullptr) makeUpBall(makeRandomBall(lastBall, red, yellow, blue, green));
+		}
+	    
+
+	}
 
 	
 };
