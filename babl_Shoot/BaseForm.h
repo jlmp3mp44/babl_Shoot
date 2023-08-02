@@ -22,7 +22,7 @@ namespace bablShoot {
 		{
 			InitializeComponent();
 			allBalls = gcnew System::Collections::Generic::List<PictureBox^>();
-			startX = 180;
+			startX = 90;
 			startY = 50;
 		}
 
@@ -109,20 +109,37 @@ namespace bablShoot {
 	}
 
 	public:bool CheckBounds(System::Collections::Generic::List<PictureBox^>^% allBalls,
-		PictureBox^% upBall, bool% getBall, Timer^ timer, PictureBox^% lastBall, bool% touch ) {
+		PictureBox^% upBall, bool% getBall, Timer^ timer, PictureBox^% lastBall,
+		bool% touch, Label^% label, int% score, int% last) {
 		for (int i = 0; i < allBalls->Count; i++) {
 			if (upBall->Bounds.IntersectsWith(allBalls[i]->Bounds)) {
 				touch = true;
-				if (upBall->ForeColor == allBalls[i]->ForeColor) {
+				
+				if (upBall->ForeColor != allBalls[i]->ForeColor) {
+					timer->Stop();
+					getBall = false;
+					touch = true;
+					last = 0;
+					timer->Stop();
+					break;
+				}
+				else {
 					getBall = true;
 					lastBall = allBalls[i];
 					allBalls[i]->Location = Point(-60, -60);
-
+					allBalls->RemoveAt(i);
+					last +=1;
+					
+					updateScore(label, score, last);
+					break;
+					
 				}
-				else getBall = false;
-				if (!getBall)
+				if (!getBall) {
 					timer->Stop();
+					break;
+				}
 			}
+
 		}
 		return getBall;
 	}
@@ -148,6 +165,30 @@ namespace bablShoot {
 
 					  return ball;
 				  }
+
+	 public: void whatSide(bool% i) {
+		 int randI = rand() % 2;
+
+		 switch (randI)
+		 {
+		 case(0): i = 0; break;
+		 case(1): i = 1; break;
+		 }
+	 }
+
+	public: void updateScore(Label^% label, int% score, int% last) {
+		if (last)  score += last * 2;
+		else score += 1;
+		label->Text = "SCORE " + score.ToString();
+	}
+	public: bool checkBallsNull(System::Collections::Generic::List<PictureBox^>^% allBalls, Timer^ timer) {
+		if (allBalls->Count == 0) {
+			return 1;
+			timer->Stop();
+		}
+			  else return 0;
+
+	        }
 
 	};
 }

@@ -25,6 +25,9 @@ namespace bablShoot {
 			lastBall = nullptr;
 			getBall = false;
 			touch = false;
+			countEnter = 0;
+			score = 1;
+			last = 0;
 		}
 
 
@@ -50,7 +53,10 @@ namespace bablShoot {
 	private: PictureBox^ lastBall;
 	private: bool getBall;
 	private: bool touch;
-
+	private: int countEnter;
+	private: System::Windows::Forms::Label^ label;
+	private: int score;
+	private: int last;
 
 	private: System::Windows::Forms::Timer^ moveTimer;
 
@@ -78,12 +84,23 @@ namespace bablShoot {
 			this->red = (gcnew System::Windows::Forms::PictureBox());
 			this->blue = (gcnew System::Windows::Forms::PictureBox());
 			this->green = (gcnew System::Windows::Forms::PictureBox());
+			this->label = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->yellow))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->red))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->blue))->BeginInit();
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->green))->BeginInit();
 			this->SuspendLayout();
+			//
+			// label
 			// 
+			label->Text = "SCORE";
+			label->Location = Point(420, 20);
+			label->AutoSize = true;
+			label->Font = gcnew System::Drawing::Font(label->Font->FontFamily,
+				label->Font->Size + 4, label->Font->Style);
+			label->BackColor = Color::White;
+			this->label->Name = L"label";
+			this->Controls->Add(label);
 			// yellow
 			// 
 			this->yellow->Image = (cli::safe_cast<System::Drawing::Image^>(resources->GetObject(L"yellow.Image")));
@@ -92,6 +109,7 @@ namespace bablShoot {
 			this->yellow->Size = System::Drawing::Size(81, 81);
 			this->yellow->SizeMode = System::Windows::Forms::PictureBoxSizeMode::Zoom;
 			this->yellow->ForeColor = Color::Yellow;
+			//this->yellow->BackColor = Color::Transparent;
 			this->yellow->TabIndex = 0;
 			this->yellow->TabStop = false;
 			// 
@@ -157,7 +175,7 @@ namespace bablShoot {
 		allBalls = makeBalls(red, yellow, blue, green);
 
 		moveTimer = gcnew Timer();
-		moveTimer->Interval = 100; // Встановіть інтервал в мілісекундах (тут 100 мс)
+		moveTimer->Interval = 350; // Встановіть інтервал в мілісекундах (тут 100 мс)
 		moveTimer->Tick += gcnew EventHandler(this, &Main::moveTimer_Tick);
 		moveTimer->Start();
 
@@ -173,16 +191,16 @@ namespace bablShoot {
 		int posY = upBall->Location.Y;
 
 		// Переміщення PictureBox вправо до певної позиції (тут до 300)
-		if (i) {
-			upBall->Location = Point(posX + 10, posY);
-			if (posX >= 380) {
+		if (i==1) {
+			upBall->Location = Point(posX + 70, posY);
+			if (posX >= 270) {
 				i = false; // Змінюємо напрямок руху
 			}
 		}
 		// Переміщення PictureBox вліво
 		else {
-			upBall->Location = Point(posX - 10, posY);
-			if (posX <= 20) {
+			upBall->Location = Point(posX - 70, posY);
+			if (posX <= 115) {
 				i = true; // Змінюємо напрямок руху
 			}
 		}
@@ -191,34 +209,63 @@ namespace bablShoot {
 
 	private: System::Void Main_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
 		if (e->KeyCode == Keys::Enter) {
+			countEnter++;
+			if(countEnter%2==0){
+				secondTimer->Stop();
+
+				whatSide(i);
+
+				lastBall = nullptr;
+				getBall = false;
+				
+				moveTimer->Start();
+			}
+			else{
 			secondTimer->Start();
 			moveTimer->Stop();
+			}
 		}
-		else if (e->KeyCode == Keys::Space) {
-			secondTimer->Stop();
-			
-			getBall = false;
-
-			moveTimer->Start();
-			//secondTimer->Start();
-		}
+		
 	}
 
 	public: System::Void secondTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
 		if (upBall->Location.Y <= 500)
-			upBall->Location = Point(upBall->Location.X, upBall->Location.Y + 10);
-		if (!CheckBounds(allBalls, upBall, getBall, secondTimer, lastBall, touch)) {
-			if (touch && (lastBall != nullptr)) {
-				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
-			}
-			else if (touch && lastBall == nullptr) {
-				PictureBox^ newBall = CopyPictureBox(upBall, upBall->Location.X, upBall->Location.Y);
-				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
-			}
-
-
+			upBall->Location = Point(upBall->Location.X, upBall->Location.Y + 30);
+		else if (CheckGlobalBounds()) {
+			updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
+			touch = false;
 		}
+		if (checkBallsNull(allBalls, secondTimer)) MessageBox::Show("YOU WIN");
+		if (!CheckBounds(allBalls, upBall, getBall, secondTimer,
+			lastBall, touch, label, score, last)) {
+			
+			if (touch && (lastBall != nullptr)) {
+				
+				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
+				touch = false;
+			}
+			else if (touch){
+				
+				PictureBox^ newBall = CopyPictureBox(upBall, upBall->Location.X, upBall->Location.Y);
+				allBalls->Add(newBall);
+				newBall->Location = Point(upBall->Location.X, upBall->Location.Y);
+				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
+				touch = false;
+				secondTimer->Stop();
+			}
+			
+		}		
 	};
+
+	public: bool CheckGlobalBounds() {
+		if (upBall->Location.Y >= 480) {
+			secondTimer->Stop();
+			return 1;
+		}
+		else return 0;
+		
+	}
 	};
 }
+
 
