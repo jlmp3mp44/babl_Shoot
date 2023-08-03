@@ -229,29 +229,33 @@ namespace bablShoot {
 	}
 
 	public: System::Void secondTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
-		if (upBall->Location.Y <= 500)
+		Console::WriteLine("secondTimer_Tick executed");
+		if (upBall->Location.Y && getBall <= 500)
 			upBall->Location = Point(upBall->Location.X, upBall->Location.Y + 30);
-		else if (CheckGlobalBounds()) {
+	    if (CheckGlobalBounds()) {
 			updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
 			touch = false;
 		}
-		if (checkBallsNull(allBalls, secondTimer)) MessageBox::Show("YOU WIN");
+		if (checkBallsNull(allBalls, secondTimer)) MessageBox::Show("YOU WIN",
+			score.ToString());
 		if (!CheckBounds(allBalls, upBall, getBall, secondTimer,
 			lastBall, touch, label, score, last)) {
 			
-			if (touch && (lastBall != nullptr)) {
+			if ((lastBall != nullptr)) {
+				//PlayAudio(L"D:/C++/babl_Shoot/sound/bubble.wav");
 				
 				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
 				touch = false;
 			}
-			else if (touch){
-				
-				PictureBox^ newBall = CopyPictureBox(upBall, upBall->Location.X, upBall->Location.Y);
-				allBalls->Add(newBall);
-				newBall->Location = Point(upBall->Location.X, upBall->Location.Y);
+			else if (touch && (lastBall==nullptr)){
+				std::cout << 1;
+				if (upBall->Location.Y >= 200) {
+					PictureBox^ newBall = CopyPictureBox(upBall, upBall->Location.X, upBall->Location.Y);
+					allBalls->Add(newBall);
+					checkCorrectBallPos(newBall);
+				}
 				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
 				touch = false;
-				secondTimer->Stop();
 			}
 			
 		}		

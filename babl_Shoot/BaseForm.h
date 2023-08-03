@@ -116,10 +116,9 @@ namespace bablShoot {
 				touch = true;
 				
 				if (upBall->ForeColor != allBalls[i]->ForeColor) {
-					timer->Stop();
 					getBall = false;
 					touch = true;
-					last = 0;
+					//last = 0;
 					timer->Stop();
 					break;
 				}
@@ -128,9 +127,8 @@ namespace bablShoot {
 					lastBall = allBalls[i];
 					allBalls[i]->Location = Point(-60, -60);
 					allBalls->RemoveAt(i);
-					last +=1;
-					
 					updateScore(label, score, last);
+					last +=1;
 					break;
 					
 				}
@@ -177,10 +175,12 @@ namespace bablShoot {
 	 }
 
 	public: void updateScore(Label^% label, int% score, int% last) {
-		if (last)  score += last * 2;
+		if (last>0)  score += last * 2;
 		else score += 1;
+		std::cout << last;
 		label->Text = "SCORE " + score.ToString();
 	}
+
 	public: bool checkBallsNull(System::Collections::Generic::List<PictureBox^>^% allBalls, Timer^ timer) {
 		if (allBalls->Count == 0) {
 			return 1;
@@ -188,7 +188,13 @@ namespace bablShoot {
 		}
 			  else return 0;
 
-	        }
+	 }
+	public: void checkCorrectBallPos(PictureBox^% ball) {
+		for (int i = 0; i < 4; i++) {
+			if (ball->Location.Y != (500 - i * 70))
+				ball->Location = Point(ball->Location.X, ball->Location.Y - 1);
+		}
+	}
 
 	};
 }
