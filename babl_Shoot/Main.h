@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseForm.h"
 #include <iostream>
+#include <chrono>
 namespace bablShoot {
 
 	using namespace System;
@@ -183,6 +184,9 @@ namespace bablShoot {
 		secondTimer->Interval = 100;
 		secondTimer->Tick += gcnew EventHandler(this, &Main::secondTimer_Tick);
 
+
+		auto start = std::chrono::high_resolution_clock::now();
+
 	}
 
 
@@ -210,51 +214,45 @@ namespace bablShoot {
 	private: System::Void Main_KeyDown(System::Object^ sender, System::Windows::Forms::KeyEventArgs^ e) {
 		if (e->KeyCode == Keys::Enter) {
 			countEnter++;
-			if(countEnter%2==0){
-				secondTimer->Stop();
-
-				whatSide(i);
-
-				lastBall = nullptr;
-				getBall = false;
-				
-				moveTimer->Start();
-			}
-			else{
+			
+			
 			secondTimer->Start();
 			moveTimer->Stop();
-			}
+			
 		}
 		
 	}
 
 	public: System::Void secondTimer_Tick(System::Object^ sender, System::EventArgs^ e) {
-		Console::WriteLine("secondTimer_Tick executed");
 		if (upBall->Location.Y && getBall <= 500)
 			upBall->Location = Point(upBall->Location.X, upBall->Location.Y + 30);
 	    if (CheckGlobalBounds()) {
 			updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
+			newBegin();
 			touch = false;
 		}
-		if (checkBallsNull(allBalls, secondTimer)) MessageBox::Show("YOU WIN",
-			score.ToString());
+		if (checkBallsNull(allBalls, secondTimer)) {
+			auto end = std::chrono::high_resolution_clock::now();
+
+			MessageBox::Show("YOU WIN",score.ToString());
+		}
 		if (!CheckBounds(allBalls, upBall, getBall, secondTimer,
 			lastBall, touch, label, score, last)) {
 			
 			if ((lastBall != nullptr)) {
-				//PlayAudio(L"D:/C++/babl_Shoot/sound/bubble.wav");
-				
 				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
+				newBegin();
 				touch = false;
 			}
 			else if (touch && (lastBall==nullptr)){
-				std::cout << 1;
 				if (upBall->Location.Y >= 200) {
 					PictureBox^ newBall = CopyPictureBox(upBall, upBall->Location.X, upBall->Location.Y);
 					allBalls->Add(newBall);
 					checkCorrectBallPos(newBall);
 				}
+				last = 0;
 				updateBall(upBall, makeRandomBall(lastBall, red, yellow, blue, green));
+				newBegin();
 				touch = false;
 			}
 			
@@ -268,6 +266,14 @@ namespace bablShoot {
 		}
 		else return 0;
 		
+	}
+	public: void newBegin() {
+		whatSide(i);
+
+		lastBall = nullptr;
+		getBall = false;
+
+		moveTimer->Start();
 	}
 	};
 }

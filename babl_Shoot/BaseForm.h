@@ -1,6 +1,9 @@
 #pragma once
 #include <iostream>
 #include <windows.h>
+#include <mmsystem.h>
+#pragma comment(lib, "winmm.lib")
+#include <chrono>
 
 
 namespace bablShoot {
@@ -118,11 +121,14 @@ namespace bablShoot {
 				if (upBall->ForeColor != allBalls[i]->ForeColor) {
 					getBall = false;
 					touch = true;
-					//last = 0;
+					
 					timer->Stop();
+
 					break;
 				}
 				else {
+					PlayAudio(L"D:/C++/babl_Shoot/sound/bubble.wav");
+					Sleep(200);
 					getBall = true;
 					lastBall = allBalls[i];
 					allBalls[i]->Location = Point(-60, -60);
@@ -150,7 +156,7 @@ namespace bablShoot {
 		ball->ForeColor = sourceBall->ForeColor;
 	}
 
-		  public: PictureBox^ makeRandomBall(PictureBox^% ball, PictureBox^ red, PictureBox^ yellow,
+	public: PictureBox^ makeRandomBall(PictureBox^% ball, PictureBox^ red, PictureBox^ yellow,
 			  PictureBox^ blue, PictureBox^ green) {
 			  array<PictureBox^>^ colors = gcnew array<PictureBox^>{ red, yellow, blue, green };
 
@@ -190,11 +196,15 @@ namespace bablShoot {
 
 	 }
 	public: void checkCorrectBallPos(PictureBox^% ball) {
-		for (int i = 0; i < 4; i++) {
-			if (ball->Location.Y != (500 - i * 70))
-				ball->Location = Point(ball->Location.X, ball->Location.Y - 1);
+		while (ball->Location.Y != 430 && ball->Location.Y != 360 &&
+			ball->Location.Y != 290 && ball->Location.Y != 220 ) {
+			ball->Location = Point(ball->Location.X, ball->Location.Y - 1);
+
 		}
 	}
+	public: void PlayAudio(const wchar_t* audioFilePath) {
+			  PlaySound(audioFilePath, NULL, SND_ASYNC | SND_FILENAME);
+		  }
 
 	};
 }
